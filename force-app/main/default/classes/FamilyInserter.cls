@@ -71,7 +71,7 @@ public inherited sharing class FamilyInserter {
         Boolean previousGroupNotEmpty = false;
         for (List<SObject> familyGroup : family) {
             if (recordCountInChunks >= DML_MAXIMUM_RECORD_COUNT_IN_OPERATION) { //TODO
-                throw new IllegalArgumentException('Chunked record count exceed limit of ' + DML_MAXIMUM_RECORD_COUNT_IN_OPERATION + '. Please pass fewer records or fewer collections.');
+                throw new FamilyInserterException('Chunked record count exceed limit of ' + DML_MAXIMUM_RECORD_COUNT_IN_OPERATION + '. Please pass fewer records or fewer collections.');
             }
 
             if (previousGroupNotEmpty) {
@@ -94,7 +94,7 @@ public inherited sharing class FamilyInserter {
     private static Boolean isCollectionSizeBelowThreshold(final List<SObject> parents, final List<SObject> children) {
         final Integer salesforceLimitWithoutOneChunk = DML_MAXIMUM_RECORD_COUNT_IN_OPERATION - DML_CHUNK_SIZE;   // As we do DML on different SObject types, we are limited to 9 chunks of 200 records. That one chunk is for the Dummy record separator.
         if (parents.size() + children.size() > salesforceLimitWithoutOneChunk) {
-            throw new IllegalArgumentException('Size sum of Parents and Children cannot exceed ' + salesforceLimitWithoutOneChunk);
+            throw new FamilyInserterException('Size sum of Parents and Children cannot exceed ' + salesforceLimitWithoutOneChunk);
         }
 
         return true;
@@ -103,4 +103,7 @@ public inherited sharing class FamilyInserter {
     private final static SObject dummyRecord {private get {return new Dummy_Object__c();}}
     private final static Integer DML_CHUNK_SIZE {private get {return 200;}}
     private final static Integer DML_MAXIMUM_RECORD_COUNT_IN_OPERATION {private get {return 2000;}}
+
+    private class FamilyInserterException extends Exception {}
+
 }
