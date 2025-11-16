@@ -1,11 +1,10 @@
-/**
- * Created by zanst on 27.10.2025.
- */
-
 @IsTest
-private without sharing class FamilyInserterTest {
+private class FamilyInserterTest {
 
-
+    @TestSetup
+    static void setup() {
+        createUserWithRequiredPermissionSet();
+    }
 
 
     @IsTest
@@ -15,7 +14,9 @@ private without sharing class FamilyInserterTest {
         Dummy_Test_Object__c child = new Dummy_Test_Object__c(Name = 'child', Parent__r = new Dummy_Test_Object__c(Name = parent_IdLookup_Value));
 
         Test.startTest();
-        FamilyInserter.insertFamily(parent, child); // Throws "System.DmlException: Operation failed due to fields being inaccessible on Sobject Dummy_Test_Object__c, check errors on Exception or Result!" !!!
+        System.runAs(getUserWithPermissions()) {
+            FamilyInserter.insertFamily(parent, child);
+        }
         Test.stopTest();
 
         Dummy_Test_Object__c childAfterInsert = [SELECT Id, Parent__c FROM Dummy_Test_Object__c WHERE Id = :child.Id];
@@ -74,4 +75,42 @@ private without sharing class FamilyInserterTest {
 //        Assert.isTrue(true, 'Exception thrown');
 //    }
 
+
+
+    private static final String USER_EMAIL_FOR_TEST_USER = 'familiInserterUserTest@testorg.com';
+
+    private static void createUserWithRequiredPermissionSet() {
+        try {
+            final String permissionSetName = 'FamilyInserter_AdminUser';
+            final User userWithPermissions = new User(Alias = 'standt', Email = USER_EMAIL_FOR_TEST_USER,
+                    EmailEncodingKey = 'UTF-8', LastName = 'Testing', LanguageLocaleKey = 'en_US',
+                    LocaleSidKey = 'en_US', Profile = new Profile(Name = 'Minimum Access - Salesforce'),
+                    TimeZoneSidKey = 'America/Los_Angeles', Username = USER_EMAIL_FOR_TEST_USER);
+
+            insert new List<SObject>{
+                    userWithPermissions,
+                    new PermissionSetAssignment(
+                            PermissionSetId = [SELECT Id FROM PermissionSet WHERE Name = :permissionSetName].Id,
+                            Assignee = new User(Email = userWithPermissions.Email)
+                    )
+            };
+        }
+        catch (Exception anyException) {
+            final String message = 'Cannot create User with required permission in TestSetup. Full message: ' + anyException;
+            throw new FamilyInserterTestException(message);
+        }
+    }
+
+    private static User getUserWithPermissions() {
+        try {
+            return [SELECT Id FROM User WHERE Email = :USER_EMAIL_FOR_TEST_USER];
+        }
+        catch (Exception anyException) {
+            final String message = 'Created User with required permission could not been retrieved. Full message: ' + anyException;
+            throw new FamilyInserterTestException(message);
+        }
+    }
+
+
+    private class FamilyInserterTestException extends Exception {}
 }
