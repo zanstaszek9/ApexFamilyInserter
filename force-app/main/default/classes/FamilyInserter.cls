@@ -30,7 +30,7 @@ public inherited sharing class FamilyInserter {
      * FamilyInserter.insertFamily(parent, child);
      **/
     public static void insertFamily(final List<SObject> parents, final List<SObject> childrenReferencingParentsUsingExternalId) {
-        final List<SObject> recordsToDml = prepareRecords(parents, childrenReferencingParentsUsingExternalId);
+        final List<SObject> recordsToDml = separateParentAndChildWithDividingRecord(parents, childrenReferencingParentsUsingExternalId);
 
         insert as user recordsToDml;
     }
@@ -40,14 +40,14 @@ public inherited sharing class FamilyInserter {
     }
 
     public static void upsertFamily(final List<SObject> parents, final List<SObject> childrenReferencingParentsUsingExternalId) {
-        final List<SObject> recordsToDml = prepareRecords(parents, childrenReferencingParentsUsingExternalId);
+        final List<SObject> recordsToDml = separateParentAndChildWithDividingRecord(parents, childrenReferencingParentsUsingExternalId);
 
         upsert as user recordsToDml;
     }
 
 
     public static List<Database.UpsertResult> upsertFamilyOnField(final List<SObject> parents, final List<SObject> childrenReferencingParentsUsingExternalId, final SObjectField fieldOnUpsert) {
-        final List<SObject> recordsToDml = prepareRecords(parents, childrenReferencingParentsUsingExternalId);
+        final List<SObject> recordsToDml = separateParentAndChildWithDividingRecord(parents, childrenReferencingParentsUsingExternalId);
 
         return Database.upsert(recordsToDml, fieldOnUpsert, AccessLevel.USER_MODE);
     }
@@ -55,7 +55,7 @@ public inherited sharing class FamilyInserter {
 
 
 
-    private static List<SObject> prepareRecords(final List<SObject> parents, final List<SObject> children) {
+    private static List<SObject> separateParentAndChildWithDividingRecord(final List<SObject> parents, final List<SObject> children) {
         final List<SObject> recordsToDml = new List<SObject>();
 
         recordsToDml.addAll(parents);
