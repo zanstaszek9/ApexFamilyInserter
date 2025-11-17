@@ -14,7 +14,7 @@ private class FamilyInserterTest {
         Dummy_Test_Object__c child = new Dummy_Test_Object__c(Name = 'child', Parent__r = new Dummy_Test_Object__c(Name = parent_IdLookup_Value));
 
         Test.startTest();
-        FamilyInserter.insertFamily(parent, child);
+        new FamilyInserter().insertFamily(parent, child);
         Test.stopTest();
 
         Dummy_Test_Object__c childAfterInsert = [SELECT Id, Parent__c FROM Dummy_Test_Object__c WHERE Id = :child.Id];
@@ -28,7 +28,7 @@ private class FamilyInserterTest {
         Dummy_Test_Object__c child = new Dummy_Test_Object__c(Name = 'child', Parent__r = new Dummy_Test_Object__c(Name = parent_IdLookup_Value));
 
         Test.startTest();
-        FamilyInserter.insertFamily(parent, child);
+        new FamilyInserter().insertFamily(parent, child);
         Test.stopTest();
 
         Dummy_Test_Object__c childAfterInsert = [SELECT Id, Parent__c FROM Dummy_Test_Object__c WHERE Id = :child.Id];
@@ -49,7 +49,7 @@ private class FamilyInserterTest {
                 new List<Dummy_Test_Object__c>{child},
                 new List<Dummy_Test_Object__c>{grandchild}
         };
-        FamilyInserter.insertFamily(family);
+        new FamilyInserter().insertFamily(family);
 
         Test.stopTest();
 
@@ -73,7 +73,7 @@ private class FamilyInserterTest {
                 new List<Dummy_Test_Object__c>{child},
                 new List<Dummy_Test_Object__c>{grandchild}
         };
-        FamilyInserter.upsertFamily(family);
+        new FamilyInserter().upsertFamily(family);
 
         Test.stopTest();
 
@@ -136,7 +136,7 @@ private class FamilyInserterTest {
 
         Test.startTest();
         try {
-            FamilyInserter.insertFamily(family);
+            new FamilyInserter().insertFamily(family);
 
             Assert.fail('Should throw exception!');
         }
@@ -160,7 +160,7 @@ private class FamilyInserterTest {
 
         Test.startTest();
         try {
-            FamilyInserter.insertFamily(family);
+            new FamilyInserter().insertFamily(family);
 
             Assert.fail('Should throw exception!');
         }

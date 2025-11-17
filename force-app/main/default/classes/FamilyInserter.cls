@@ -17,7 +17,7 @@ public inherited sharing class FamilyInserter {
      * Contact child = new Contact(LastName = 'child', ReportsTo = new Contact(Email = parent_IdLookup_Value));
      * FamilyInserter.insertFamily(parent, child);
      **/
-    public static List<Database.SaveResult> insertFamily(final SObject parent, final SObject childReferencingParentsUsingExternalId) {
+    public List<Database.SaveResult> insertFamily(final SObject parent, final SObject childReferencingParentsUsingExternalId) {
         return insertFamily(new List<SObject>{parent}, new List<SObject>{childReferencingParentsUsingExternalId}, false, AccessLevel.SYSTEM_MODE);
     }
 
@@ -45,7 +45,7 @@ public inherited sharing class FamilyInserter {
      *     new List<SObject>{ childOne, childTwo, childThree }
      * );
      **/
-    public static List<Database.SaveResult> insertFamily(final List<SObject> parents, final List<SObject> childrenReferencingParentsUsingExternalId) {
+    public List<Database.SaveResult> insertFamily(final List<SObject> parents, final List<SObject> childrenReferencingParentsUsingExternalId) {
         return insertFamily(parents, childrenReferencingParentsUsingExternalId, true, AccessLevel.SYSTEM_MODE);
     }
 
@@ -61,7 +61,7 @@ public inherited sharing class FamilyInserter {
      *
      * @return List<Database.SaveResult> Results of insertion.
      **/
-    public static List<Database.SaveResult> insertFamily(final List<SObject> parents, final List<SObject> childrenReferencingParentsUsingExternalId, final Boolean allOrNothing, final AccessLevel accessLevel) {
+    public List<Database.SaveResult> insertFamily(final List<SObject> parents, final List<SObject> childrenReferencingParentsUsingExternalId, final Boolean allOrNothing, final AccessLevel accessLevel) {
         final List<SObject> recordsToDml = separateParentAndChildWithDividingRecord(parents, childrenReferencingParentsUsingExternalId);
         return Database.insert(recordsToDml, allOrNothing, accessLevel);
     }
@@ -76,7 +76,7 @@ public inherited sharing class FamilyInserter {
      *
      * @return List<Database.UpsertResult> Results of upsert.
      **/
-    public static List<Database.UpsertResult> upsertFamily(final SObject parent, final SObject childReferencingParentsUsingExternalId) {
+    public List<Database.UpsertResult> upsertFamily(final SObject parent, final SObject childReferencingParentsUsingExternalId) {
         return upsertFamily(new List<SObject>{parent}, new List<SObject>{childReferencingParentsUsingExternalId}, true, AccessLevel.SYSTEM_MODE);
     }
 
@@ -91,7 +91,7 @@ public inherited sharing class FamilyInserter {
      *
      * @return List<Database.UpsertResult> Upsert results.
      **/
-    public static List<Database.UpsertResult> upsertFamily(final List<SObject> parents, final List<SObject> childrenReferencingParentsUsingExternalId, final Boolean allOrNothing, final AccessLevel accessLevel) {
+    public List<Database.UpsertResult> upsertFamily(final List<SObject> parents, final List<SObject> childrenReferencingParentsUsingExternalId, final Boolean allOrNothing, final AccessLevel accessLevel) {
         final List<SObject> recordsToDml = separateParentAndChildWithDividingRecord(parents, childrenReferencingParentsUsingExternalId);
         return Database.upsert(recordsToDml, allOrNothing, accessLevel);
     }
@@ -107,7 +107,7 @@ public inherited sharing class FamilyInserter {
      *
      * @return List<Database.UpsertResult> Upsert results.
      **/
-    public static List<Database.UpsertResult> upsertFamilyOnField(final List<SObject> parents, final List<SObject> childrenReferencingParentsUsingExternalId, final SObjectField fieldOnUpsert) {
+    public List<Database.UpsertResult> upsertFamilyOnField(final List<SObject> parents, final List<SObject> childrenReferencingParentsUsingExternalId, final SObjectField fieldOnUpsert) {
         return upsertFamilyOnField(parents, childrenReferencingParentsUsingExternalId, fieldOnUpsert, true, AccessLevel.SYSTEM_MODE);
     }
 
@@ -123,7 +123,7 @@ public inherited sharing class FamilyInserter {
      *
      * @return List<Database.UpsertResult> Upsert results.
      **/
-    public static List<Database.UpsertResult> upsertFamilyOnField(final List<SObject> parents, final List<SObject> childrenReferencingParentsUsingExternalId, final SObjectField fieldOnUpsert, final Boolean allOrNothing, final AccessLevel accessLevel) {
+    public List<Database.UpsertResult> upsertFamilyOnField(final List<SObject> parents, final List<SObject> childrenReferencingParentsUsingExternalId, final SObjectField fieldOnUpsert, final Boolean allOrNothing, final AccessLevel accessLevel) {
         final List<SObject> recordsToDml = separateParentAndChildWithDividingRecord(parents, childrenReferencingParentsUsingExternalId);
         return Database.upsert(recordsToDml, fieldOnUpsert, allOrNothing, accessLevel);
     }
@@ -138,7 +138,7 @@ public inherited sharing class FamilyInserter {
      *
      * @return List<SObject> Flattened structure ready for DML.
      **/
-    private static List<SObject> separateParentAndChildWithDividingRecord(final List<SObject> parents, final List<SObject> children) {
+    private List<SObject> separateParentAndChildWithDividingRecord(final List<SObject> parents, final List<SObject> children) {
         final List<SObject> recordsToDml = new List<SObject>();
 
         recordsToDml.addAll(parents);
@@ -174,7 +174,7 @@ public inherited sharing class FamilyInserter {
      * };
      * FamilyInserter.insertFamily(family);
      **/
-    public static List<Database.SaveResult> insertFamily(final List<List<SObject>> family) {
+    public List<Database.SaveResult> insertFamily(final List<List<SObject>> family) {
         return insertFamily(family, true, AccessLevel.SYSTEM_MODE);
     }
 
@@ -188,7 +188,7 @@ public inherited sharing class FamilyInserter {
      *
      * @return List<Database.SaveResult> Insert results.
      **/
-    public static List<Database.SaveResult> insertFamily(final List<List<SObject>> family, final Boolean allOrNothing, final AccessLevel accessLevel) {
+    public List<Database.SaveResult> insertFamily(final List<List<SObject>> family, final Boolean allOrNothing, final AccessLevel accessLevel) {
         final List<SObject> recordsToDml = arrangeCollectionIntoChunksWithDividingRecord(family);
         return Database.insert(recordsToDml, allOrNothing, accessLevel);
     }
@@ -201,7 +201,7 @@ public inherited sharing class FamilyInserter {
      *
      * @return List<Database.UpsertResult> Upsert results.
      **/
-    public static List<Database.UpsertResult> upsertFamily(final List<List<SObject>> family) {
+    public List<Database.UpsertResult> upsertFamily(final List<List<SObject>> family) {
         return upsertFamily(family, true, AccessLevel.SYSTEM_MODE);
     }
 
@@ -214,7 +214,7 @@ public inherited sharing class FamilyInserter {
      *
      * @return List<Database.UpsertResult> Upsert results.
      **/
-    public static List<Database.UpsertResult> upsertFamily(final List<List<SObject>> family, final SObjectField fieldOnUpsert) {
+    public List<Database.UpsertResult> upsertFamily(final List<List<SObject>> family, final SObjectField fieldOnUpsert) {
         return upsertFamily(family, fieldOnUpsert, true, AccessLevel.SYSTEM_MODE);
     }
 
@@ -228,7 +228,7 @@ public inherited sharing class FamilyInserter {
      *
      * @return List<Database.UpsertResult> Upsert results.
      **/
-    public static List<Database.UpsertResult> upsertFamily(final List<List<SObject>> family, final Boolean allOrNothing, final AccessLevel accessLevel) {
+    public List<Database.UpsertResult> upsertFamily(final List<List<SObject>> family, final Boolean allOrNothing, final AccessLevel accessLevel) {
         final List<SObject> recordsToDml = arrangeCollectionIntoChunksWithDividingRecord(family);
         return Database.upsert(recordsToDml, allOrNothing, accessLevel);
     }
@@ -244,7 +244,7 @@ public inherited sharing class FamilyInserter {
      *
      * @return List<Database.UpsertResult> Upsert results.
      **/
-    public static List<Database.UpsertResult> upsertFamily(final List<List<SObject>> family, final SObjectField fieldOnUpsert, final Boolean allOrNothing, final AccessLevel accessLevel) {
+    public List<Database.UpsertResult> upsertFamily(final List<List<SObject>> family, final SObjectField fieldOnUpsert, final Boolean allOrNothing, final AccessLevel accessLevel) {
         final List<SObject> recordsToDml = arrangeCollectionIntoChunksWithDividingRecord(family);
         return Database.upsert(recordsToDml, fieldOnUpsert, allOrNothing, accessLevel);
     }
@@ -258,7 +258,7 @@ public inherited sharing class FamilyInserter {
      *
      * @return List<SObject> Prepared DML list.
      **/
-    private static List<SObject> arrangeCollectionIntoChunksWithDividingRecord(final List<List<SObject>> family) {
+    private List<SObject> arrangeCollectionIntoChunksWithDividingRecord(final List<List<SObject>> family) {
         final List<SObject> recordsToDml = new List<SObject>();
 
         Integer nonEmptyGroups = 0;
@@ -298,7 +298,7 @@ public inherited sharing class FamilyInserter {
      *
      * @return Boolean true if within limits.
      **/
-    private static Boolean isCollectionSizeBelowThreshold(final List<SObject> parents, final List<SObject> children) {
+    private Boolean isCollectionSizeBelowThreshold(final List<SObject> parents, final List<SObject> children) {
         final Integer salesforceLimitWithoutOneChunk = DML_MAXIMUM_RECORD_COUNT_IN_OPERATION - DML_CHUNK_SIZE;
         if (parents.size() + children.size() > salesforceLimitWithoutOneChunk) {
             throw new FamilyInserterRecordCountExceededException('Size sum of Parents and Children cannot exceed ' + salesforceLimitWithoutOneChunk);
