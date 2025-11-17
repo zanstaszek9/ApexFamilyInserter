@@ -46,37 +46,61 @@ private class FamilyInserterTest {
         Assert.areEqual(child.Id, grandchildAfterInsert.Parent__c, 'Grandchild should be linked with middle parent.');
         Assert.areEqual(parent.Id, grandchildAfterInsert.Parent__r.Parent__c, 'Child should be linked with top parent.');
     }
-//
-//
-//
-//
-//    @IsTest
-//    static void testFamilyTooManyMembers() {
-//        List<Dummy_Test_Object__c> parents = new List<Dummy_Test_Object__c>();
-//        List<String> emailsForExternalIds = new List<String>();
-//
-//        for (Integer i = 0; i < 200; i++) {
-//            String emailExtId = 'testvv'+i+'@gmai.com';
-//            parents.add(new Dummy_Test_Object__c(LastName = 'parent', Email = emailExtId));
-//            emailsForExternalIds.add(emailExtId);
-//        }
-//
-//        List<List<SObject>> family = new List<List<SObject>>();
-//        family.add(parents);
-//
-//        for (Integer i = 0; i < 5; i++) {
-//            family.add(new List<Dummy_Test_Object__c>{new Dummy_Test_Object__c(LastName = 'child', ReportsTo = new Dummy_Test_Object__c(Email = emailsForExternalIds[0]))});
-//        }
-//
-//        try {
-//            FamilyInserter.insertFamily(family);
-//            Assert.fail('Should throw exception!');
-//        }
-//        catch (Exception e) {
-//            // TODO Catch certain exception
-//        }
-//        Assert.isTrue(true, 'Exception thrown');
-//    }
+
+
+
+    @IsTest
+    static void testFamilyTooManyChunks() {
+        List<Dummy_Test_Object__c> parents = new List<Dummy_Test_Object__c>();
+        List<String> valuesForExternalIds = new List<String>();
+
+        for (Integer i = 0; i < 200; i++) {
+            String parent_IdLookup_Value = 'parent'+i;
+            parents.add(new Dummy_Test_Object__c(Name = parent_IdLookup_Value));
+            valuesForExternalIds.add(parent_IdLookup_Value);
+        }
+
+        List<List<SObject>> family = new List<List<SObject>>();
+        family.add(parents);
+
+
+        for (Integer i = 0; i < 5; i++) {
+            family.add(new List<Dummy_Test_Object__c>{new Dummy_Test_Object__c(Name = 'child'+i, Parent__r = new Dummy_Test_Object__c(Name = valuesForExternalIds[0]))});
+        }
+
+        try {
+            System.runAs(getUserWithPermissions()) {
+                FamilyInserter.insertFamily(family);
+            }
+            Assert.fail('Should throw exception!');
+        }
+        catch (FamilyInserter.FamilyInserterException e) {
+            Assert.isTrue(true, 'Exception thrown');
+        }
+    }
+
+    @IsTest
+    static void testFamilyTooManyMembers() {
+        List<Dummy_Test_Object__c> parents = new List<Dummy_Test_Object__c>();
+
+        for (Integer i = 0; i < 2001; i++) {
+            String parent_IdLookup_Value = 'parent'+i;
+            parents.add(new Dummy_Test_Object__c(Name = parent_IdLookup_Value));
+        }
+
+        List<List<SObject>> family = new List<List<SObject>>();
+        family.add(parents);
+
+        try {
+            System.runAs(getUserWithPermissions()) {
+                FamilyInserter.insertFamily(family);
+            }
+            Assert.fail('Should throw exception!');
+        }
+        catch (FamilyInserter.FamilyInserterException e) {
+            Assert.isTrue(true, 'Exception thrown');
+        }
+    }
 
 
 

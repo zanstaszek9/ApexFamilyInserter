@@ -55,7 +55,7 @@ public inherited sharing class FamilyInserter {
         final List<SObject> recordsToDml = new List<SObject>();
 
         recordsToDml.addAll(parents);
-        recordsToDml.add(dummyRecord);
+        recordsToDml.add(dummyRecordToSeparateChunks);
         recordsToDml.addAll(children);
 
         isCollectionSizeBelowThreshold(parents, children);
@@ -64,18 +64,20 @@ public inherited sharing class FamilyInserter {
 
 
     public static void insertFamily(final List<List<SObject>> family) {
+        final List<SObject> recordsToDml = arrangeCollectionIntoChunksWithDividingRecord(family);
+
+        insert as user recordsToDml;
+    }
+
+    private static List<SObject> arrangeCollectionIntoChunksWithDividingRecord(final List<List<SObject>> family) {
         final List<SObject> recordsToDml = new List<SObject>();
 
         Integer nonEmptyGroups = 0;
         Integer recordCountInChunks = 0;
         Boolean previousGroupNotEmpty = false;
         for (List<SObject> familyGroup : family) {
-            if (recordCountInChunks >= DML_MAXIMUM_RECORD_COUNT_IN_OPERATION) { //TODO
-                throw new FamilyInserterException('Chunked record count exceed limit of ' + DML_MAXIMUM_RECORD_COUNT_IN_OPERATION + '. Please pass fewer records or fewer collections.');
-            }
-
             if (previousGroupNotEmpty) {
-                recordsToDml.add(dummyRecord);
+                recordsToDml.add(dummyRecordToSeparateChunks);
             }
             if (familyGroup?.isEmpty() == true) {
                 previousGroupNotEmpty = false;
@@ -85,25 +87,35 @@ public inherited sharing class FamilyInserter {
             nonEmptyGroups++;
             previousGroupNotEmpty = true;
             recordCountInChunks += Math.max(DML_CHUNK_SIZE, familyGroup.size());
+
+            if (recordCountInChunks >= DML_MAXIMUM_RECORD_COUNT_IN_OPERATION) {
+                throw new FamilyInserterRecordCountExceededException('Chunked record count exceed limit of ' + DML_MAXIMUM_RECORD_COUNT_IN_OPERATION + '. Please pass fewer records or fewer collections.');
+            }
+
+            if (nonEmptyGroups >= MAXIMUM_CHUNKS) {
+                throw new FamilyInserterChunkCountExceededException('Maximum chunk count is ' + MAXIMUM_CHUNKS + '. Please pass fewer collections or fewer records.');
+            }
         }
 
-
-        insert as user recordsToDml;
+        return recordsToDml;
     }
 
     private static Boolean isCollectionSizeBelowThreshold(final List<SObject> parents, final List<SObject> children) {
         final Integer salesforceLimitWithoutOneChunk = DML_MAXIMUM_RECORD_COUNT_IN_OPERATION - DML_CHUNK_SIZE;   // As we do DML on different SObject types, we are limited to 9 chunks of 200 records. That one chunk is for the Dummy record separator.
         if (parents.size() + children.size() > salesforceLimitWithoutOneChunk) {
-            throw new FamilyInserterException('Size sum of Parents and Children cannot exceed ' + salesforceLimitWithoutOneChunk);
+            throw new FamilyInserterRecordCountExceededException('Size sum of Parents and Children cannot exceed ' + salesforceLimitWithoutOneChunk);
         }
 
         return true;
     }
 
-    private final static SObject dummyRecord {private get {return new Dummy_Object__c();}}
+    private final static SObject dummyRecordToSeparateChunks {private get {return new Dummy_Object__c();}}
     private final static Integer DML_CHUNK_SIZE {private get {return 200;}}
     private final static Integer DML_MAXIMUM_RECORD_COUNT_IN_OPERATION {private get {return 2000;}}
+    private final static Integer MAXIMUM_CHUNKS {private get {return 5;}} // Five, because each DummyRecord as separator counts as additional chunk
 
-    private class FamilyInserterException extends Exception {}
+    @TestVisible private virtual class FamilyInserterException extends Exception {}
+    private class FamilyInserterChunkCountExceededException extends FamilyInserterException {}
+    private class FamilyInserterRecordCountExceededException extends FamilyInserterException {}
 
 }
