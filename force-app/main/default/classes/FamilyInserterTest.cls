@@ -65,6 +65,7 @@ private class FamilyInserterTest {
 
 
 
+
     @IsTest
     static void testFamilyTooManyChunks() {
         List<Dummy_Test_Object__c> parents = new List<Dummy_Test_Object__c>();
@@ -84,15 +85,16 @@ private class FamilyInserterTest {
             family.add(new List<Dummy_Test_Object__c>{new Dummy_Test_Object__c(Name = 'child'+i, Parent__r = new Dummy_Test_Object__c(Name = valuesForExternalIds[0]))});
         }
 
+        Test.startTest();
         try {
-            System.runAs(getUserWithPermissions()) {
-                FamilyInserter.insertFamily(family);
-            }
+            FamilyInserter.insertFamily(family);
+
             Assert.fail('Should throw exception!');
         }
         catch (FamilyInserter.FamilyInserterException e) {
             Assert.isTrue(true, 'Exception thrown');
         }
+        Test.stopTest();
     }
 
     @IsTest
@@ -107,15 +109,17 @@ private class FamilyInserterTest {
         List<List<SObject>> family = new List<List<SObject>>();
         family.add(parents);
 
+        Test.startTest();
         try {
-            System.runAs(getUserWithPermissions()) {
-                FamilyInserter.insertFamily(family);
-            }
+            FamilyInserter.insertFamily(family);
+
             Assert.fail('Should throw exception!');
         }
         catch (FamilyInserter.FamilyInserterException e) {
             Assert.isTrue(true, 'Exception thrown');
         }
+        Test.stopTest();
+
     }
 
 
