@@ -5,7 +5,7 @@ public inherited sharing class FamilyInserter {
      * @param parent
      * @param childReferencingParentsUsingExternalId
      * @example
-     * String parent_IdLookup_Value = 'test2123@gmai.com';
+     * String parent_IdLookup_Value = 'test2123@gmail.com';
      * Contact parent = new Contact(LastName = 'parent', Email = parent_IdLookup_Value);
      * Contact child = new Contact(LastName = 'child', ReportsTo = new Contact(Email = parent_IdLookup_Value));
      * FamilyInserter.insertFamily(parent, child);
@@ -24,10 +24,19 @@ public inherited sharing class FamilyInserter {
      * @param parents
      * @param childrenReferencingParentsUsingExternalId
      * @example
-     * String parent_IdLookup_Value = 'test2123@gmai.com';
-     * Contact parent = new Contact(LastName = 'parent', Email = parent_IdLookup_Value);    //TODO
-     * Contact child = new Contact(LastName = 'child', ReportsTo = new Contact(Email = parent_IdLookup_Value));
-     * FamilyInserter.insertFamily(parent, child);
+     * String parent_IdLookup_Value = 'test2123@gmail.com';
+     * String parentTwo_IdLookup_Value = 'test9977@gmail.com';
+     * Contact parent = new Contact(LastName = 'parent', Email = parent_IdLookup_Value);
+     * Contact parentTwo = new Contact(LastName = 'parentTwo', Email = parentTwo_IdLookup_Value);
+     *
+     * Contact childOne = new Contact(LastName = 'child', ReportsTo = new Contact(Email = parent_IdLookup_Value));
+     * Contact childTwo = new Contact(LastName = 'childTwo', ReportsTo = new Contact(Email = parentTwo_IdLookup_Value));
+     * Contact childThree = new Contact(LastName = 'childThree', ReportsTo = new Contact(Email = parentTwo_IdLookup_Value));
+     *
+     * FamilyInserter.insertFamily(
+     *     new List<SObject>{ parentOne, parentTwo },
+     *     new List<SObject>{ childOne, childTwo, childThree }
+     * );
      **/
     public static void insertFamily(final List<SObject> parents, final List<SObject> childrenReferencingParentsUsingExternalId) {
         final List<SObject> recordsToDml = separateParentAndChildWithDividingRecord(parents, childrenReferencingParentsUsingExternalId);
@@ -67,6 +76,24 @@ public inherited sharing class FamilyInserter {
     }
 
 
+    /**
+     * @description
+     * @param family
+     * @example
+     * String parentExtId = 'parent@example.com';
+     * String childExtId = 'child@example.com';
+     *
+     * Contact parent = new Contact(LastName = 'Parent', Email = parentExtId);
+     * Contact child = new Contact(LastName = 'Child', Email = childExtId,ReportsTo = new Contact(Email = parentExtId));
+     * Contact grandchild = new Contact(LastName = 'Grandchild', ReportsTo = new Contact(Email = childExtId));
+     *
+     * List<List<SObject>> family = new List<List<SObject>>{
+     *      new List<SObject>{ parent },
+     *      new List<SObject>{ child },
+     *      new List<SObject>{ grandchild }
+     * };
+     * FamilyInserter.insertFamily(family);
+     **/
     public static void insertFamily(final List<List<SObject>> family) {
         final List<SObject> recordsToDml = arrangeCollectionIntoChunksWithDividingRecord(family);
 
