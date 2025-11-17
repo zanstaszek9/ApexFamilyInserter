@@ -15,7 +15,7 @@ public inherited sharing class FamilyInserter {
      * String parent_IdLookup_Value = 'test2123@gmail.com';
      * Contact parent = new Contact(LastName = 'parent', Email = parent_IdLookup_Value);
      * Contact child = new Contact(LastName = 'child', ReportsTo = new Contact(Email = parent_IdLookup_Value));
-     * FamilyInserter.insertFamily(parent, child);
+     * new FamilyInserter().insertFamily(parent, child);
      **/
     public List<Database.SaveResult> insertFamily(final SObject parent, final SObject childReferencingParentsUsingExternalId) {
         return insertFamily(new List<SObject>{parent}, new List<SObject>{childReferencingParentsUsingExternalId});
@@ -40,7 +40,7 @@ public inherited sharing class FamilyInserter {
      * Contact childOne = new Contact(LastName = 'child', ReportsTo = new Contact(Email = parent_IdLookup_Value));
      * Contact childTwo = new Contact(LastName = 'childTwo', ReportsTo = new Contact(Email = parentTwo_IdLookup_Value));
      * Contact childThree = new Contact(LastName = 'childThree', ReportsTo = new Contact(Email = parentTwo_IdLookup_Value));
-     * FamilyInserter.insertFamily(
+     * new FamilyInserter().insertFamily(
      *     new List<SObject>{ parentOne, parentTwo },
      *     new List<SObject>{ childOne, childTwo, childThree }
      * );
@@ -140,7 +140,7 @@ public inherited sharing class FamilyInserter {
      *      new List<SObject>{ child },
      *      new List<SObject>{ grandchild }
      * };
-     * FamilyInserter.insertFamily(family);
+     * new FamilyInserter().insertFamily(family);
      **/
     public List<Database.SaveResult> insertFamily(final List<List<SObject>> family) {
         return insertFamily(family, true, AccessLevel.SYSTEM_MODE);
