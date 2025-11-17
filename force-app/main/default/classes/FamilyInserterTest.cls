@@ -28,7 +28,7 @@ private class FamilyInserterTest {
         Dummy_Test_Object__c child = new Dummy_Test_Object__c(Name = 'child', Parent__r = new Dummy_Test_Object__c(Name = parent_IdLookup_Value));
 
         Test.startTest();
-        new FamilyInserter().insertFamily(parent, child);
+        new FamilyInserter().upsertFamily(parent, child);
         Test.stopTest();
 
         Dummy_Test_Object__c childAfterInsert = [SELECT Id, Parent__c FROM Dummy_Test_Object__c WHERE Id = :child.Id];
