@@ -1,5 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <description>No respawns. Enjoy digital afterlife.</description>
+        <name>Flush_dummy_record</name>
+        <label>Flush dummy record 🚽</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>EmptyRecycleBin</actionName>
+        <actionType>apex</actionType>
+        <dataTypeMappings>
+            <typeName>T__listOfSObjects</typeName>
+            <typeValue>Dummy_Object__c</typeValue>
+        </dataTypeMappings>
+        <dataTypeMappings>
+            <typeName>T__sobj</typeName>
+            <typeValue>Dummy_Object__c</typeValue>
+        </dataTypeMappings>
+        <flowTransactionModel>Automatic</flowTransactionModel>
+        <inputParameters>
+            <name>sobj</name>
+            <value>
+                <elementReference>$Record</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>EmptyRecycleBin</nameSegment>
+        <offset>0</offset>
+    </actionCalls>
     <apiVersion>65.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <description>Deleting a Dummy Record in an asynchronous context 🚽</description>
@@ -31,6 +57,9 @@
         <label>Delete dummy record</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
+        <connector>
+            <targetReference>Flush_dummy_record</targetReference>
+        </connector>
         <inputReference>$Record</inputReference>
     </recordDeletes>
     <start>
