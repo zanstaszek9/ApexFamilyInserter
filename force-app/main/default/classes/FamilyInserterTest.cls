@@ -14,9 +14,7 @@ private class FamilyInserterTest {
         Dummy_Test_Object__c child = new Dummy_Test_Object__c(Name = 'child', Parent__r = new Dummy_Test_Object__c(Name = parent_IdLookup_Value));
 
         Test.startTest();
-        System.runAs(getUserWithPermissions()) {
-            FamilyInserter.insertFamily(parent, child);
-        }
+        FamilyInserter.insertFamily(parent, child);
         Test.stopTest();
 
         Dummy_Test_Object__c childAfterInsert = [SELECT Id, Parent__c FROM Dummy_Test_Object__c WHERE Id = :child.Id];
@@ -30,9 +28,7 @@ private class FamilyInserterTest {
         Dummy_Test_Object__c child = new Dummy_Test_Object__c(Name = 'child', Parent__r = new Dummy_Test_Object__c(Name = parent_IdLookup_Value));
 
         Test.startTest();
-        System.runAs(getUserWithPermissions()) {
-            FamilyInserter.insertFamily(parent, child);
-        }
+        FamilyInserter.insertFamily(parent, child);
         Test.stopTest();
 
         Dummy_Test_Object__c childAfterInsert = [SELECT Id, Parent__c FROM Dummy_Test_Object__c WHERE Id = :child.Id];
@@ -87,8 +83,38 @@ private class FamilyInserterTest {
     }
 
 
+    // *** User mode tests
+    @IsTest
+    static void testParentAndChildUserMode() {
+        System.runAs(getUserWithPermissions()) {
+            testParentAndChild();
+        }
+    }
+
+    @IsTest
+    static void testParentAndChildUpsertUserMode() {
+        System.runAs(getUserWithPermissions()) {
+            testParentAndChildUpsert();
+        }
+    }
+
+    @IsTest
+    static void testParentAndChildAndGrandchildUserMode() {
+        System.runAs(getUserWithPermissions()) {
+            testParentAndChildAndGrandchild();
+        }
+    }
+
+    @IsTest
+    static void testParentAndChildAndGrandchildUpsertUserMode() {
+        System.runAs(getUserWithPermissions()) {
+            testParentAndChildAndGrandchildUpsert();
+        }
+    }
 
 
+
+    // *** Exception and bulk Tests
     @IsTest
     static void testFamilyTooManyChunks() {
         List<Dummy_Test_Object__c> parents = new List<Dummy_Test_Object__c>();
@@ -147,6 +173,7 @@ private class FamilyInserterTest {
 
 
 
+    // *** Test Setups, helpers
     private static final String USER_EMAIL_FOR_TEST_USER = 'familiInserterUserTest@testorg.com';
 
     private static void createUserWithRequiredPermissionSet() {
