@@ -18,7 +18,7 @@ public inherited sharing class FamilyInserter {
      * FamilyInserter.insertFamily(parent, child);
      **/
     public List<Database.SaveResult> insertFamily(final SObject parent, final SObject childReferencingParentsUsingExternalId) {
-        return insertFamily(new List<SObject>{parent}, new List<SObject>{childReferencingParentsUsingExternalId}, false, AccessLevel.SYSTEM_MODE);
+        return insertFamily(new List<SObject>{parent}, new List<SObject>{childReferencingParentsUsingExternalId});
     }
 
     /**
@@ -69,7 +69,7 @@ public inherited sharing class FamilyInserter {
 
     /**
      * @description
-     * Performs an upsert on a parent and child SObject pair using External Id relationships.
+     * Performs an upsert on a parent and child SObject pair using External Id relationships. Upsert on field (SObjectField field) cannot be specified due to the limitations of the inserting method.
      *
      * @param parent Parent SObject.
      * @param childReferencingParentsUsingExternalId Child referencing parent using External Id.
@@ -82,7 +82,7 @@ public inherited sharing class FamilyInserter {
 
     /**
      * @description
-     * Performs an upsert operation on collections of parent and child objects.
+     * Performs an upsert operation on collections of parent and child objects. Upsert on field (SObjectField field) cannot be specified due to the limitations of the inserting method.
      *
      * @param parents List of parent SObjects.
      * @param childrenReferencingParentsUsingExternalId List of child SObjects referencing parents.
@@ -94,38 +94,6 @@ public inherited sharing class FamilyInserter {
     public List<Database.UpsertResult> upsertFamily(final List<SObject> parents, final List<SObject> childrenReferencingParentsUsingExternalId, final Boolean allOrNothing, final AccessLevel accessLevel) {
         final List<SObject> recordsToDml = separateParentAndChildWithDividingRecord(parents, childrenReferencingParentsUsingExternalId);
         return Database.upsert(recordsToDml, allOrNothing, accessLevel);
-    }
-
-
-    /**
-     * @description
-     * Performs an upsert operation on parents and children on a specific field.
-     *
-     * @param parents Parent SObjects.
-     * @param childrenReferencingParentsUsingExternalId Child SObjects referencing parents.
-     * @param fieldOnUpsert Field used for upsert matching.
-     *
-     * @return List<Database.UpsertResult> Upsert results.
-     **/
-    public List<Database.UpsertResult> upsertFamilyOnField(final List<SObject> parents, final List<SObject> childrenReferencingParentsUsingExternalId, final SObjectField fieldOnUpsert) {
-        return upsertFamilyOnField(parents, childrenReferencingParentsUsingExternalId, fieldOnUpsert, true, AccessLevel.SYSTEM_MODE);
-    }
-
-    /**
-     * @description
-     * Upsert records using specified external Id field, with control over DML mode.
-     *
-     * @param parents List of parents.
-     * @param childrenReferencingParentsUsingExternalId List of children.
-     * @param fieldOnUpsert Field used as External Id during upsert.
-     * @param allOrNothing Whether to perform atomic DML.
-     * @param accessLevel Access mode for DML.
-     *
-     * @return List<Database.UpsertResult> Upsert results.
-     **/
-    public List<Database.UpsertResult> upsertFamilyOnField(final List<SObject> parents, final List<SObject> childrenReferencingParentsUsingExternalId, final SObjectField fieldOnUpsert, final Boolean allOrNothing, final AccessLevel accessLevel) {
-        final List<SObject> recordsToDml = separateParentAndChildWithDividingRecord(parents, childrenReferencingParentsUsingExternalId);
-        return Database.upsert(recordsToDml, fieldOnUpsert, allOrNothing, accessLevel);
     }
 
 
@@ -195,7 +163,7 @@ public inherited sharing class FamilyInserter {
 
     /**
      * @description
-     * Upserts nested SObject collections (multi-level family structure).
+     * Upserts nested SObject collections (multi-level family structure). Upsert on field (SObjectField field) cannot be specified due to the limitations of the inserting method.
      *
      * @param family Nested lists of SObjects.
      *
@@ -205,22 +173,10 @@ public inherited sharing class FamilyInserter {
         return upsertFamily(family, true, AccessLevel.SYSTEM_MODE);
     }
 
-    /**
-     * @description
-     * Upserts nested SObject groups using a specified External Id field.
-     *
-     * @param family Nested SObject collections.
-     * @param fieldOnUpsert Field to match during upsert.
-     *
-     * @return List<Database.UpsertResult> Upsert results.
-     **/
-    public List<Database.UpsertResult> upsertFamily(final List<List<SObject>> family, final SObjectField fieldOnUpsert) {
-        return upsertFamily(family, fieldOnUpsert, true, AccessLevel.SYSTEM_MODE);
-    }
 
     /**
      * @description
-     * Upserts nested collections with control over allOrNothing and access mode.
+     * Upserts nested collections with control over allOrNothing and access mode. Upsert on field (SObjectField field) cannot be specified due to the limitations of the inserting method.
      *
      * @param family Nested SObject lists.
      * @param allOrNothing Whether DML is atomic.
@@ -233,21 +189,6 @@ public inherited sharing class FamilyInserter {
         return Database.upsert(recordsToDml, allOrNothing, accessLevel);
     }
 
-    /**
-     * @description
-     * Upserts nested SObject groups using a custom External Id field with full DML control.
-     *
-     * @param family Nested lists of SObjects.
-     * @param fieldOnUpsert External Id field to match on.
-     * @param allOrNothing true to roll back entire operation if any record fails.
-     * @param accessLevel DML access mode.
-     *
-     * @return List<Database.UpsertResult> Upsert results.
-     **/
-    public List<Database.UpsertResult> upsertFamily(final List<List<SObject>> family, final SObjectField fieldOnUpsert, final Boolean allOrNothing, final AccessLevel accessLevel) {
-        final List<SObject> recordsToDml = arrangeCollectionIntoChunksWithDividingRecord(family);
-        return Database.upsert(recordsToDml, fieldOnUpsert, allOrNothing, accessLevel);
-    }
 
     /**
      * @description
