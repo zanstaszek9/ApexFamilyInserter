@@ -24,6 +24,22 @@ private class FamilyInserterTest {
     }
 
     @IsTest
+    static void testParentAndChildUpsert() {
+        String parent_IdLookup_Value = 'parent';
+        Dummy_Test_Object__c parent = new Dummy_Test_Object__c(Name = parent_IdLookup_Value);
+        Dummy_Test_Object__c child = new Dummy_Test_Object__c(Name = 'child', Parent__r = new Dummy_Test_Object__c(Name = parent_IdLookup_Value));
+
+        Test.startTest();
+        System.runAs(getUserWithPermissions()) {
+            FamilyInserter.insertFamily(parent, child);
+        }
+        Test.stopTest();
+
+        Dummy_Test_Object__c childAfterInsert = [SELECT Id, Parent__c FROM Dummy_Test_Object__c WHERE Id = :child.Id];
+        Assert.areEqual(parent.Id, childAfterInsert.Parent__c, 'Child should be linked with parent.');
+    }
+
+    @IsTest
     static void testParentAndChildAndGrandchild() {
         String parent_IdLookup_Value = 'parent';
         String child_IdLookup_Value = 'child';

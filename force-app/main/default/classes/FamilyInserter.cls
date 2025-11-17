@@ -35,6 +35,10 @@ public inherited sharing class FamilyInserter {
         insert as user recordsToDml;
     }
 
+    public static void upsertFamily(final SObject parent, final SObject childReferencingParentsUsingExternalId) {
+        upsertFamily(new List<SObject>{parent}, new List<SObject>{childReferencingParentsUsingExternalId});
+    }
+
     public static void upsertFamily(final List<SObject> parents, final List<SObject> childrenReferencingParentsUsingExternalId) {
         final List<SObject> recordsToDml = prepareRecords(parents, childrenReferencingParentsUsingExternalId);
 
