@@ -168,7 +168,23 @@ private class FamilyInserterTest {
             Assert.isTrue(true, 'Exception thrown');
         }
         Test.stopTest();
+    }
 
+    @IsTest
+    static void testParentAndChildSetupObjectThrowsException() {
+        PermissionSet anySetupObjectRecord = new PermissionSet(Name = 'anyRecord1', Label = 'anyRecord1');
+        PermissionSet anotherSetupObjectRecord = new PermissionSet(Name = 'anyRecord2', Label = 'anyRecord2');
+
+        Test.startTest();
+        try {
+            new FamilyInserter().insertFamily(anySetupObjectRecord, anotherSetupObjectRecord);
+
+            Assert.fail('Should throw enriched Mixed DML exception!');
+        }
+        catch (FamilyInserter.FamilyInserterMixedDmlException e) {
+            Assert.isTrue(true, 'Enriched Mixed DML Exception thrown');
+        }
+        Test.stopTest();
     }
 
 

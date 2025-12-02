@@ -63,7 +63,38 @@ public inherited sharing class FamilyInserter {
      **/
     public List<Database.SaveResult> insertFamily(final List<SObject> parents, final List<SObject> childrenReferencingParentsUsingExternalId, final Boolean allOrNothing, final AccessLevel accessLevel) {
         final List<SObject> recordsToDml = separateParentAndChildWithDividingRecord(parents, childrenReferencingParentsUsingExternalId);
-        return Database.insert(recordsToDml, allOrNothing, accessLevel);
+        try {
+            return Database.insert(recordsToDml, allOrNothing, accessLevel);
+        }
+        catch (DmlException dmlException) {
+            if (dmlException.getMessage().contains('MIXED_DML_OPERATION')) {
+                throw enrichAndThrowMixedDmlException(parents, childrenReferencingParentsUsingExternalId);
+            }
+            else {
+                throw dmlException;
+            }
+        }
+    }
+
+    private FamilyInserterMixedDmlException enrichAndThrowMixedDmlException(final List<SObject> parents, final List<SObject> children) {
+        /*
+        *   I've attempted to check whether some Setup object can be used as a separator, but could not find a candidate that would satisfy these conditions:
+        *       a) Would be safe to use without breaking actual Setup or accesses
+        *       b) Does not require additional permissions for the running User
+        *       c) Allows Flows, so it can be safely deleted with Async Path.
+        *   Therefore, it's better to throw Exception here. Moreover, I doubt it is a common case to create multiple Setup Objects that have parent-child relation (it's rare for non-setup objects already lol).
+        *   I deliberately do not check for the Setup object types before the DML and allow exception to happen, because that would impact code performance to early handle to case in which library should never be used.
+        *   @zanstaszek9
+        * */
+        final Set<String> parentTypes = new Set<String>();
+        final Set<String> childTypes = new Set<String>();
+        for (SObject parent : parents) {
+            parentTypes.add(parent.getSObjectType().toString());
+        }
+        for (SObject child : children) {
+            childTypes.add(child.getSObjectType().toString());
+        }
+        return new FamilyInserterMixedDmlException('MIXED DML OPERATION occurred. Family Inserter cannot process Setup objects. Please try different approach. Parent Types: [' + String.join(parentTypes, ',') + '] --- Child Types: [' + String.join(childTypes, ',') + '].');
     }
 
 
@@ -255,5 +286,6 @@ public inherited sharing class FamilyInserter {
     @TestVisible private virtual class FamilyInserterException extends Exception {}
     private class FamilyInserterChunkCountExceededException extends FamilyInserterException {}
     private class FamilyInserterRecordCountExceededException extends FamilyInserterException {}
+    @TestVisible private class FamilyInserterMixedDmlException extends FamilyInserterException {}
 
 }
