@@ -8,7 +8,7 @@ private class FamilyInserterTest {
 
 
     @IsTest
-    static void testParentAndChild() {
+    static void parentAndChildInsert() {
         String parent_IdLookup_Value = 'parent';
         Dummy_Test_Object__c parent = new Dummy_Test_Object__c(Name = parent_IdLookup_Value);
         Dummy_Test_Object__c child = new Dummy_Test_Object__c(Name = 'child', Parent__r = new Dummy_Test_Object__c(Name = parent_IdLookup_Value));
@@ -22,7 +22,7 @@ private class FamilyInserterTest {
     }
 
     @IsTest
-    static void testParentAndChildUpsert() {
+    static void parentAndChildUpsert() {
         String parent_IdLookup_Value = 'parent';
         Dummy_Test_Object__c parent = new Dummy_Test_Object__c(Name = parent_IdLookup_Value);
         Dummy_Test_Object__c child = new Dummy_Test_Object__c(Name = 'child', Parent__r = new Dummy_Test_Object__c(Name = parent_IdLookup_Value));
@@ -36,7 +36,7 @@ private class FamilyInserterTest {
     }
 
     @IsTest
-    static void testParentAndChildAndGrandchild() {
+    static void parentAndChildAndGrandchildInsert() {
         String parent_IdLookup_Value = 'parent';
         String child_IdLookup_Value = 'child';
         Dummy_Test_Object__c parent = new Dummy_Test_Object__c(Name = parent_IdLookup_Value);
@@ -60,7 +60,7 @@ private class FamilyInserterTest {
 
 
     @IsTest
-    static void testParentAndChildAndGrandchildUpsert() {
+    static void parentAndChildAndGrandchildUpsert() {
         String parent_IdLookup_Value = 'parent';
         String child_IdLookup_Value = 'child';
         Dummy_Test_Object__c parent = new Dummy_Test_Object__c(Name = parent_IdLookup_Value);
@@ -85,30 +85,30 @@ private class FamilyInserterTest {
 
     // *** User mode tests
     @IsTest
-    static void testParentAndChildUserMode() {
+    static void parentAndChildInsertUserMode() {
         System.runAs(getUserWithPermissions()) {
-            testParentAndChild();
+            parentAndChildInsert();
         }
     }
 
     @IsTest
-    static void testParentAndChildUpsertUserMode() {
+    static void parentAndChildUpsertUserMode() {
         System.runAs(getUserWithPermissions()) {
-            testParentAndChildUpsert();
+            parentAndChildUpsert();
         }
     }
 
     @IsTest
-    static void testParentAndChildAndGrandchildUserMode() {
+    static void parentAndChildAndGrandchildInsertUserMode() {
         System.runAs(getUserWithPermissions()) {
-            testParentAndChildAndGrandchild();
+            parentAndChildAndGrandchildInsert();
         }
     }
 
     @IsTest
-    static void testParentAndChildAndGrandchildUpsertUserMode() {
+    static void parentAndChildAndGrandchildUpsertUserMode() {
         System.runAs(getUserWithPermissions()) {
-            testParentAndChildAndGrandchildUpsert();
+            parentAndChildAndGrandchildUpsert();
         }
     }
 
@@ -116,7 +116,7 @@ private class FamilyInserterTest {
 
     // *** Exception and bulk Tests
     @IsTest
-    static void testFamilyTooManyChunks() {
+    static void familyTooManyChunksThrowsException() {
         List<Dummy_Test_Object__c> parents = new List<Dummy_Test_Object__c>();
         List<String> valuesForExternalIds = new List<String>();
 
@@ -147,7 +147,7 @@ private class FamilyInserterTest {
     }
 
     @IsTest
-    static void testFamilyTooManyMembers() {
+    static void familyTooManyMembersThrowsException() {
         List<Dummy_Test_Object__c> parents = new List<Dummy_Test_Object__c>();
 
         for (Integer i = 0; i < 2001; i++) {
@@ -168,7 +168,23 @@ private class FamilyInserterTest {
             Assert.isTrue(true, 'Exception thrown');
         }
         Test.stopTest();
+    }
 
+    @IsTest
+    static void parentAndChildSetupObjectThrowsException() {
+        PermissionSet anySetupObjectRecord = new PermissionSet(Name = 'anyRecord1', Label = 'anyRecord1');
+        PermissionSet anotherSetupObjectRecord = new PermissionSet(Name = 'anyRecord2', Label = 'anyRecord2');
+
+        Test.startTest();
+        try {
+            new FamilyInserter().insertFamily(anySetupObjectRecord, anotherSetupObjectRecord);
+
+            Assert.fail('Should throw enriched Mixed DML exception!');
+        }
+        catch (FamilyInserter.FamilyInserterMixedDmlException e) {
+            Assert.isTrue(true, 'Enriched Mixed DML Exception thrown');
+        }
+        Test.stopTest();
     }
 
 
